@@ -1,0 +1,15 @@
+[package]
+name = "gibbername-cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.69"
+argh = "0.1.10"
+futures-lite = "1.12.0"
+gibbername = { path = "../gibbername" }
+# melprot = "0.13.3"
+melprot = { git = "https://github.com/mel-project/melprot" }
+melstructs = "0.3.2"
