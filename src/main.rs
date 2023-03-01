@@ -37,11 +37,11 @@ struct Register {
 
 fn main() -> anyhow::Result<()> {
     let args: Cli = argh::from_env();
-
     // keep around a client
-    let client = futures_lite::future::block_on(
+    let client = block_on(
         melprot::Client::autoconnect(NetID::Testnet)
     )?;
+
     match args.command {
         Command::Lookup(lookup) => {
             // we don't need a futures runtime, block_on is fine
