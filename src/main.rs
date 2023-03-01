@@ -32,7 +32,10 @@ struct Register {
     owner: Address,
 
     #[argh(option, description = "the data to be bound to the gibbername")]
-    binding: String
+    binding: String,
+
+    #[argh(option, description = "the name of the wallet sending the transaction")]
+    wallet_name: String,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -50,7 +53,7 @@ fn main() -> anyhow::Result<()> {
         }
         Command::Register(register) => {
             // gibbername will prompt the user
-            let name = block_on(gibbername::register(&client, register.owner, &register.binding))?;
+            let name = block_on(gibbername::register(&client, register.owner, &register.binding, &register.wallet_name))?;
             println!("registered {:?}", name);
         }
     };
