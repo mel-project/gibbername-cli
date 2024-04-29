@@ -5,6 +5,8 @@ use melstructs::{Address, NetID};
 #[derive(FromArgs, PartialEq, Debug)]
 /// Look up a name in the Gibbername registry.
 struct Cli {
+    #[argh(option, description = "either 'mainnet' or 'testnet'")]
+    network: NetID,
     #[argh(subcommand)]
     command: Command,
 }
@@ -13,7 +15,7 @@ struct Cli {
 #[argh(subcommand)]
 enum Command {
     Lookup(Lookup),
-    Register(Register)
+    Register(Register),
 }
 
 #[derive(FromArgs, PartialEq, Debug)]
@@ -28,22 +30,21 @@ struct Lookup {
 #[argh(subcommand, name = "register")]
 /// Register a name
 struct Register {
-    #[argh(option, description = "the Mel address of the gibbername owner")]
+    #[argh(option, description = "mel address of the gibbername owner")]
     owner: Address,
 
-    #[argh(option, description = "the data to be bound to the gibbername")]
+    #[argh(option, description = "data to be bound to the gibbername")]
     binding: String,
 
-    #[argh(option, description = "the name of the wallet sending the transaction")]
-    wallet_name: String,
+    #[argh(option, description = "path to the wallet sending the transaction")]
+    wallet_path: String,
 }
 
 fn main() -> anyhow::Result<()> {
+    env_logger::init();
     let args: Cli = argh::from_env();
     // keep around a client
-    let client = block_on(
-        melprot::Client::autoconnect(NetID::Testnet)
-    )?;
+    let client = block_on(melprot::Client::autoconnect(args.network))?;
 
     match args.command {
         Command::Lookup(lookup) => {
@@ -53,7 +54,12 @@ fn main() -> anyhow::Result<()> {
         }
         Command::Register(register) => {
             // gibbername will prompt the user
-            let name = block_on(gibbername::register(&client, register.owner, &register.binding, &register.wallet_name))?;
+            let name = block_on(gibbername::register(
+                &client,
+                register.owner,
+                &register.binding,
+                &register.wallet_path,
+            ))?;
             println!("registered {:?}", name);
         }
     };
